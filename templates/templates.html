@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="/static/stylesheets/template.css">
+
+        <title>Random Money Generator</title>
+    </head>
+
+    <body>
+
+        <form action="/">
+            <label for="gold">Gold:</label>
+            <input type="text" id="gold" name="Gold" value={{.final.Gold}}><br><br>
+
+            <label for="silver">Silver:</label>
+            <input type="text" id="silver" name="Silver" value={{.final.Silver}}><br><br>
+
+            <label for="copper">Copper:</label>
+            <input type="text" id="copper" name="Copper" value={{.final.Copper}}><br><br>
+
+            <input type="submit" value="Submit">
+        </form>
+
+        <div class="result">
+            <br><br>
+
+            Remaining funds:
+            <br>
+            {{.final.Gold}} gold, {{.final.Silver}} silver, {{.final.Copper}} copper
+            <br><br>
+
+            Spent funds:
+            <br>
+            {{.spent.Gold}} gold, {{.spent.Silver}} silver, {{.spent.Copper}} copper
+        </div>
+
+    </body>
+</html>
