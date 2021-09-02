@@ -1,0 +1,2 @@
+Other commands
+`certbot certonly --nginx -n -d burghs.greatdnd.world --agree-tos --email  alexromine3@gmail.com`
