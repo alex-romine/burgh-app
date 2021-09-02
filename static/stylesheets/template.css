@@ -5,12 +5,12 @@ body  {
     background-size:cover
 }
 
-.result {
-    font-family: 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif';
-    font-size: 3rem;
-    color: aliceblue;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center
-}
+/*.result {*/
+/*    font-family: 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif';*/
+/*    font-size: 3rem;*/
+/*    color: aliceblue;*/
+/*    height: 100vh;*/
+/*    display: flex;*/
+/*    justify-content: center;*/
+/*    align-items: center*/
+/*}*/
