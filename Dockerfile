@@ -1,13 +1,12 @@
-FROM ubuntu:focal
+FROM golang:1.17.1
 
 RUN apt update
 RUN apt install -y vim
 RUN apt install -y curl
 
-COPY install-go.sh /app/install-go.sh 
-RUN source /app/install-go.sh
+COPY . /app
+RUN /app/build-app.sh
 
-ENV PATH="/usr/local/go/bin:${PATH}"
+WORKDIR /app-dev
 
-#COPY . /app
-WORKDIR /app
+CMD /app/my-app
