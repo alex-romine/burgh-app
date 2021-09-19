@@ -1,16 +1,9 @@
 package main
 
-//We import 4 important libraries
-//1. “net/http” to access the core go http functionality
-//2. “fmt” for formatting our text
-//3. “html/templates” a library that allows us to interact with our html file.
-//4. "time" - a library for working with date and time.
-
 import (
 	"fmt"
 	"html/template"
 	"log"
-	"math"
 	"math/rand"
 	"net/http"
 	"reflect"
@@ -18,10 +11,10 @@ import (
 )
 
 type Money struct {
-	Gold   string
-	Silver string
-	Copper string
-	CoinsToSpend string
+	Gold   float64
+	Silver float64
+	Copper float64
+	CoinsToSpend float64
 }
 
 type Percents struct {
@@ -30,16 +23,10 @@ type Percents struct {
 	Copper float64
 }
 
-var (
-    WarningLogger *log.Logger
-    InfoLogger    *log.Logger
-    ErrorLogger   *log.Logger
-)
-
 func main() {
-	InitialFunds := Money{"0", "0", "0", "0"}
-	SpentFunds := Money{"0", "0", "0", "0"}
-	FinalFunds := Money{"0", "0", "0", "0"}
+	InitialFunds := Money{0,0,0,0}
+	SpentFunds := Money{0,0,0,0}
+	FinalFunds := Money{0,0,0,0}
 
 	templates := template.Must(template.ParseFiles("templates/templates.html"))
 
@@ -55,17 +42,17 @@ func main() {
 		coinsToReturn, _ := strconv.ParseFloat(r.FormValue("Spend"), 64)
 		log.Printf("coinsToReturn: %v", coinsToReturn)
 
-		gold := math.Floor(coinsToReturn * percentages.Gold)
-		log.Printf("initial gold spent: %v", gold)
-		silver := math.Floor(coinsToReturn * percentages.Silver)
-		log.Printf("initial silver spent: %v", silver)
-		copper := math.Floor(coinsToReturn * percentages.Copper)
-		log.Printf("initial copper spent: %v", copper)
+		spentGold, spentSilver, spentCopper := GetSpendAmounts(coinsToReturn, percentages)
+		//spentGold, spentSilver, spentCopper = manageExpectedAndCalculated(spentGold, spentSilver, spentCopper, coinsToReturn, percentages)
 
-		gold, silver, copper = manageExpectedAndCalculated(gold, silver, copper, coinsToReturn, percentages)
+		SpentFunds.Gold = spentGold
+		SpentFunds.Silver = spentSilver
+		SpentFunds.Copper = spentCopper
+		log.Printf("spent funds: %v", SpentFunds)
 
 		for _, metal := range moneyTypes {
-			if initialAmount := r.FormValue(metal); initialAmount != "" {
+			initialAmount, _ := strconv.ParseFloat(r.FormValue(metal), 64)
+			if initialAmount != 0 {
 				CalculateMetalSpent(metal, initialAmount, &InitialFunds, &SpentFunds, &FinalFunds)
 			}
 		}
@@ -80,7 +67,7 @@ func main() {
 		}); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		
+
 		log.Println("")
 	})
 
@@ -88,6 +75,26 @@ func main() {
 	//Print any errors from starting the webserver using fmt
 	fmt.Println("Listening")
 	fmt.Println(http.ListenAndServe(":8888", nil))
+}
+
+func GetSpendAmounts(coinsToReturn float64, percentages Percents) (float64, float64, float64) {
+	spentGold := 0.0
+	spentSilver := 0.0
+	spentCopper := 0.0
+
+	for n := 0.0; n < coinsToReturn; n++ {
+		randomNumber := rand.Float64()
+		log.Printf("random#: %v", randomNumber)
+		if randomNumber <= percentages.Gold {
+			spentGold = spentGold + 1
+		} else if randomNumber <= percentages.Gold+percentages.Silver {
+			spentSilver = spentSilver + 1
+		} else {
+			spentCopper = spentCopper + 1
+		}
+	}
+
+	return spentGold, spentSilver, spentCopper
 }
 
 func manageExpectedAndCalculated(gold float64, silver float64, copper float64, coinsToReturn float64, percentages Percents) (float64, float64, float64) {
@@ -131,23 +138,19 @@ func getMetalPercentages(r *http.Request) Percents {
 		percentages := Percents{0, 0, 0}
 		return percentages
 	}
-
 }
 
-func CalculateMetalSpent(metal string, initialAmount string, InitialFunds *Money, SpentFunds *Money, FinalFunds *Money) {
-	initialAmountInt, _ := strconv.Atoi(initialAmount)
+func CalculateMetalSpent(metal string, initialAmount float64, InitialFunds *Money, SpentFunds *Money, FinalFunds *Money) {
 	setMetalValue(metal, "initial", InitialFunds, initialAmount)
 
-	spentMetalInteger := rand.Intn(initialAmountInt + 1)
-	spentMetal := strconv.Itoa(spentMetalInteger)
+	spentMetal := reflect.ValueOf(SpentFunds).Elem().FieldByName(metal).Float()
 	setMetalValue(metal, "spent", SpentFunds, spentMetal)
 
-	finalMetalInteger := initialAmountInt - spentMetalInteger
-	finalMetal := strconv.Itoa(finalMetalInteger)
-	setMetalValue(metal, "final", FinalFunds, finalMetal)
+	finalMetalFloat := initialAmount - spentMetal
+	setMetalValue(metal, "final", FinalFunds, finalMetalFloat)
 }
 
-func setMetalValue(metal string, fund string, fundType *Money, newValue string) {
+func setMetalValue(metal string, fund string, fundType *Money, newValue float64) {
 	log.Printf("setting %v %v to %v", fund, metal, newValue)
-	reflect.ValueOf(fundType).Elem().FieldByName(metal).SetString(newValue)
+	reflect.ValueOf(fundType).Elem().FieldByName(metal).SetFloat(newValue)
 }

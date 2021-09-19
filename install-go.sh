@@ -1,0 +1,1 @@
+curl -L -O https://golang.org/dl/go1.17.1.linux-arm64.tar.gz
