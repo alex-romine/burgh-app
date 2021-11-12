@@ -5,8 +5,7 @@ RUN apt install -y vim
 RUN apt install -y curl
 
 COPY . /app
-RUN /app/build-app.sh
+WORKDIR /app
+RUN ./build-app.sh
 
-WORKDIR /app-dev
-
-CMD /app/my-app
+CMD /my-app
