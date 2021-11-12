@@ -8,4 +8,4 @@ COPY . /app
 WORKDIR /app
 RUN ./build-app.sh
 
-CMD /my-app
+CMD /burgh
