@@ -1,5 +1,18 @@
-echo 'building image'
-docker build . -t aromine2/burgh:1 && echo 'running image' && docker run -it -p 8888:8888 -v $PWD:/app-dev aromine2/burgh:1
+set -e
 
-echo 'chowning'
-sudo chown $USER:$USER -R $PWD
+IMAGE_NAME="$1"
+IMAGE_VERSION="0.1.$(date +%Y%m%d%I%M%S)"
+GOOS="$2"
+GOARCH="$3"
+
+if [ -z "$IMAGE_NAME" ]
+then
+  echo "need image name"
+  exit 1
+fi
+
+echo "building image"
+docker build . -t "aromine2/$IMAGE_NAME:$IMAGE_VERSION"
+
+echo "pushing image"
+docker push "aromine2/$IMAGE_NAME:$IMAGE_VERSION"
