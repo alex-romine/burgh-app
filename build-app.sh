@@ -6,4 +6,4 @@ echo "running tests"
 go test
 
 echo "building app"
-go build main.go
+go build .
