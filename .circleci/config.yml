@@ -9,6 +9,7 @@ jobs:
     working_directory: ~/repo
     machine:
       image: ubuntu-2004:202101-01
+    resource_class: arm.medium
     steps:
       - checkout
       - run:
